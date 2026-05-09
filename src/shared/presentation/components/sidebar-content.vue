@@ -19,14 +19,14 @@ import logo from '../assets/logo-electrocorp.png'
   <div class="sidebar">
     <pv-menu :model="items" class="pv-menu">
         <template #start>
-                <span class="menu-header">
+                <div class="menu-header">
                     <img :src=logo width="35" height="40" alt="logo" />
                     <p class="logo" >ElectroCorp</p>
-                </span>
+                </div>
         </template>
 
         <template #submenulabel="{ item }">
-          <span class="text-primary font-bold">{{ item.label }}</span>
+          <span>{{ item.label }}</span>
         </template>
 
         <template #item="{ item, props }">

@@ -25,7 +25,7 @@ const useManagementStore = defineStore('management', () => {
         return homesLoaded ? homes.value.length : 0;
     });
 
-    const tutorialsCount = computed(() => {
+    const devicesCount = computed(() => {
         return devicesLoaded ? devices.value.length : 0;
     });
 
@@ -153,7 +153,7 @@ const useManagementStore = defineStore('management', () => {
         homesLoaded,
         devicesLoaded,
 
-        homesCount,
+        homeCount,
         devicesCount,
 
         fetchHomes,
