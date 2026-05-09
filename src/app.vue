@@ -5,3 +5,7 @@ import MainLayout from "./shared/presentation/layouts/main-layout.vue";
 <template>
   <main-layout></main-layout>
 </template>
+<style scoped>
+
+
+</style>
