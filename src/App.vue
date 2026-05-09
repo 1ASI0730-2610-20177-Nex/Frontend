@@ -1,7 +1,7 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import MainLayout from "./shared/presentation/layouts/main-layout.vue";
 </script>
 
 <template>
-  <HelloWorld />
+  <main-layout></main-layout>
 </template>
