@@ -1,8 +1,10 @@
 import {createRouter, createWebHistory} from "vue-router";
 import Home from "./shared/presentation/views/home.vue";
+import ManagementRoutes from "./management/presentation/management-routes.js";
 
 const routes = [
     {path: '/home', name:'Home' ,component: Home, meta:{title:'Home'}},
+    { path: '/management',      name: 'management', children: ManagementRoutes },
 
 
 ]
