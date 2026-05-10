@@ -1,7 +1,7 @@
 <script setup>
 import {useRouter} from "vue-router";
 import {useConfirm} from "primevue";
-import useManagementStore from "../../application/management.store.js";
+import useManagementStore from "../../../application/management.store.js";
 import {onMounted, toRefs} from "vue";
 
 const router = useRouter();
@@ -47,11 +47,7 @@ const confirmDelete = (home) => {
   <div class="p-4">
     <h1>Homes</h1>
 
-    <pv-button
-        label="New Home"
-        class="mb-3"
-        icon="pi pi-plus"
-        @click="navigateToNew"/>
+    <pv-button label="New Home" class="mb-3" icon="pi pi-plus" @click="navigateToNew"/>
 
     <pv-data-table
         :loading="!homesLoaded"
@@ -62,38 +58,18 @@ const confirmDelete = (home) => {
         striped-rows
         table-style="min-width: 50rem">
 
-      <pv-column
-          header="ID"
-          field="id"
-          sortable/>
-
-      <pv-column
-          header="Name"
-          field="name"
-          sortable/>
+      <pv-column header="ID" field="id" sortable/>
+      <pv-column header="Name" field="name" sortable/>
 
       <pv-column header="Actions">
         <template #body="slotProps">
-          <pv-button
-              icon="pi pi-pencil"
-              rounded
-              text
-              @click="navigateToEdit(slotProps.data.id)"/>
-
-          <pv-button
-              icon="pi pi-trash"
-              rounded
-              severity="danger"
-              text
-              @click="confirmDelete(slotProps.data)"/>
+          <pv-button icon="pi pi-pencil" text rounded  @click="navigateToEdit(slotProps.data.id)"/>
+          <pv-button icon="pi pi-trash" text rounded severity="danger"  @click="confirmDelete(slotProps.data)"/>
         </template>
       </pv-column>
     </pv-data-table>
 
-    <div
-        v-if="errors.length"
-        class="text-red-500 mt-3">
-
+    <div v-if="errors.length" class="text-red-500 mt-3">
       Errors:
       {{ errors.map(e => e.message).join(', ') }}
     </div>

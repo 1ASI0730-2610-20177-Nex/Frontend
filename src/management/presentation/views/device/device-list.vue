@@ -1,7 +1,7 @@
 <script setup>
 import {useRouter} from "vue-router";
 import {useConfirm} from "primevue";
-import useManagementStore from "../../application/management.store.js";
+import useManagementStore from "../../../application/management.store.js";
 import {onMounted, toRefs} from "vue";
 
 const router = useRouter();
@@ -21,7 +21,7 @@ onMounted(() => {
 });
 
 const navigateToNew = () => {
-  router.push({name: 'management-device-new'});
+  router.push({name: 'management-devices-new'});
 };
 
 const navigateToEdit = (id) => {
