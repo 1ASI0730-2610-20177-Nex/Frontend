@@ -10,7 +10,7 @@ export class DeviceEntity {
                     powerWatts = 0,
                     status = '',
                     homeId = null,
-    }) {
+                }) {
         this.id = id;
         this.name = name;
         this.type = type;

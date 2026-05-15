@@ -3,9 +3,8 @@ import MainLayout from "./shared/presentation/layouts/main-layout.vue";
 </script>
 
 <template>
-  <main-layout></main-layout>
+<MainLayout></MainLayout>
 </template>
+
 <style scoped>
-
-
 </style>
