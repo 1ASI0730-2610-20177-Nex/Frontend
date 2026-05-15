@@ -1,14 +1,12 @@
 <script setup>
-import ToolbarContent from "../components/toolbar-content.vue";
-
+import SidebarContent from '../components/sidebar-content.vue';
 </script>
 
 <template>
-      <toolbar-content></toolbar-content>
-
+  <div class="layout">
+    <sidebar-content />
+    <main class="layout-main layout-body">
+      <router-view />
+    </main>
+  </div>
 </template>
-
-<style scoped>
-
-
-</style>

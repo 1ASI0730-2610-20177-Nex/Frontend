@@ -1,90 +1,133 @@
 <script setup>
-import { ref } from "vue";
+import { reactive, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-const items = ref([
-  {separator: true},
-  {label:'Management',items:[
-      {label: 'Home', icon: 'pi pi-fw pi-home', to: '/management/home'},
-      {label: 'Devices', icon: 'pi pi-fw pi-desktop', to: '/management/devices'},
-    ]},
-  {label:'Consumption',items:[
-      {label: 'Analytics', icon: 'pi pi-chart-line', to: '/consumption/analytics'},
-    ]}
-])
+const router = useRouter();
+const route = useRoute();
 
-import logo from '../assets/logo-electrocorp.png'
+const menuGroups = [
+  {
+    id: 'management',
+    label: 'Management Home',
+    items: [
+      { label: 'Homes', to: '/management/homes' },
+      { label: 'Devices', to: '/management/devices' },
+    ],
+  },
+  {
+    id: 'consumption',
+    label: 'Consumption',
+    items: [
+      { label: 'Analytics', to: '/consumption/analytics', disabled: true },
+    ],
+  },
+];
+
+const expandedGroups = reactive({
+  management: false,
+  consumption: false,
+});
+
+const isItemActive = (item) => {
+  if (!item.to) return false;
+  return route.path === item.to || route.path.startsWith(`${item.to}/`);
+};
+
+const isGroupActive = (group) =>
+    group.items.some((item) => isItemActive(item));
+
+const toggleGroup = (id) => {
+  expandedGroups[id] = !expandedGroups[id];
+};
+
+const navigateTo = (item) => {
+  if (!item.disabled && item.to) router.push(item.to);
+};
+
+const logout = () => {
+  router.push({ name: 'Home' });
+};
+
+watch(
+    () => route.path,
+    () => {
+      menuGroups.forEach((group) => {
+        if (isGroupActive(group)) expandedGroups[group.id] = true;
+      });
+    },
+    { immediate: true }
+);
 </script>
 
 <template>
-  <div class="sidebar">
-    <pv-menu :model="items" class="pv-menu">
-        <template #start>
-                <div class="menu-header">
-                    <img :src=logo width="35" height="40" alt="logo" />
-                    <p class="logo" >ElectroCorp</p>
-                </div>
-        </template>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <p class="sidebar-brand">ElectroCorp</p>
+    </div>
 
-        <template #submenulabel="{ item }">
-          <span>{{ item.label }}</span>
-        </template>
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <button
+          type="button"
+          class="sidebar-link"
+          :class="{ 'sidebar-link-active': route.path === '/home' }"
+          @click="router.push('/home')"
+      >
+        Home
+      </button>
 
-        <template #item="{ item, props }">
-          <a v-ripple class="flex items-center" v-bind="props.action">
-            <span :class="item.icon" />
-            <span>{{ item.label }}</span>
-          </a>
-        </template>
+      <section
+          v-for="group in menuGroups"
+          :key="group.id"
+          class="sidebar-group"
+      >
+        <button
+            type="button"
+            class="sidebar-group-toggle"
+            :class="{ 'sidebar-group-toggle-active': isGroupActive(group) }"
+            :aria-expanded="expandedGroups[group.id]"
+            @click="toggleGroup(group.id)"
+        >
+          <span class="sidebar-group-label">{{ group.label }}</span>
+          <span
+              class="sidebar-chevron"
+              :class="{ 'sidebar-chevron-open': expandedGroups[group.id] }"
+              aria-hidden="true"
+          />
+        </button>
 
-        <template #end>
-          <pv-button v-ripple class="menu-end">
-            <span class="font-bold">Amy Elsner</span>
-            <span class="text-sm">Admin</span>
-          </pv-button>
-        </template>
+        <ul v-show="expandedGroups[group.id]" class="sidebar-submenu">
+          <li
+              v-for="item in group.items"
+              :key="`${group.id}-${item.label}`"
+          >
+            <button
+                v-if="item.disabled"
+                type="button"
+                class="sidebar-link sidebar-link-disabled"
+                disabled
+                title="Coming soon"
+            >
+              {{ item.label }}
+            </button>
+            <button
+                v-else
+                type="button"
+                class="sidebar-link"
+                :class="{ 'sidebar-link-active': isItemActive(item) }"
+                @click="navigateTo(item)"
+            >
+              {{ item.label }}
+            </button>
+          </li>
+        </ul>
+      </section>
+    </nav>
 
-
-    </pv-menu>
-  </div>
-
+    <footer class="sidebar-footer">
+      <p class="sidebar-user-name">Osamu Dazai</p>
+      <button type="button" class="sidebar-logout" @click="logout">
+        Logout
+      </button>
+    </footer>
+  </aside>
 </template>
-
-<style scoped>
-.sidebar{
-  height: 100vh;
-  width: 250px;
-}
-:deep(.p-menu){
-  border: none;
-  border-right: 1px solid #e5e7eb;
-  border-radius: 0;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-.menu-header{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-.menu-end{
-  display: flex;
-  flex-direction: column;
-  margin-top:  auto;
-  width: 100%;
-  height: 60px;
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  justify-content: end;
-}
-.pv-menu{
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-</style>

@@ -92,7 +92,7 @@ const useManagementStore = defineStore('management', () => {
     function deleteHome(home) {
         managementApi.deleteHome(home.id)
             .then(() => {
-                const index = homes.value.findIndex(h => h.id === home.id);
+                const index = homes.value.findIndex(h => h.id == home.id);
 
                 if (index !== -1) {
                     homes.value.splice(index, 1);
@@ -134,7 +134,7 @@ const useManagementStore = defineStore('management', () => {
     function deleteDevice(device) {
         managementApi.deleteDevice(device.id)
             .then(() => {
-                const index = devices.value.findIndex(d => d.id === device.id);
+                const index = devices.value.findIndex(d => d.id == device.id);
 
                 if (index !== -1) {
                     devices.value.splice(index, 1);

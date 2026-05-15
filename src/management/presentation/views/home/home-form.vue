@@ -1,34 +1,26 @@
 <script setup>
-import {useRoute, useRouter} from "vue-router";
-import useManagementStore from "../../../application/management.store.js";
-import {computed, onMounted, ref, toRefs} from "vue";
-import {HomeEntity} from "../../../domain/model/home.entity.js";
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import useManagementStore from '../../../application/management.store.js';
+import { HomeEntity } from '../../../domain/model/home.entity.js';
 
 const route = useRoute();
 const router = useRouter();
-
 const store = useManagementStore();
-const {errors, addHome, updateHome} = store;
+const { errors, addHome, updateHome } = store;
 
-const form = ref({name: '',type:''});
+const form = ref({ name: '', type: '' });
 const isEdit = computed(() => !!route.params.id);
 
-
-function getHomeById(id) {
-  return store.getHomeById(id);
-}
-
 onMounted(() => {
-  console.log(route.params.id);
   if (isEdit.value) {
-    const home = getHomeById(route.params.id);
-    console.log(home);
-    if (home) { form.value.name = home.name;
-                form.value.type = home.type;  }
-      else router.push({name: 'publishing-categories'});
+    const home = store.getHomeById(route.params.id);
+    if (home) {
+      form.value.name = home.name;
+      form.value.type = home.type;
+    } else router.push({ name: 'management-homes' });
   }
 });
-
 
 const saveHome = () => {
   const home = new HomeEntity({
@@ -36,59 +28,53 @@ const saveHome = () => {
     name: form.value.name,
     type: form.value.type,
   });
-  if (isEdit.value) updateHome(home); else addHome(home);
+  if (isEdit.value) updateHome(home);
+  else addHome(home);
   navigateBack();
 };
 
-const navigateBack = () => {
-  router.push({name: 'management-homes'});
-};
+const navigateBack = () => router.push({ name: 'management-homes' });
 </script>
 
 <template>
-  <div class="p-4">
-    <h1>{{ isEdit ? 'Edit Home' : 'New Home' }}</h1>
+  <section class="page">
+    <header class="page-head">
+      <h1 class="page-title">{{ isEdit ? 'Edit Home' : 'New Home' }}</h1>
+    </header>
 
-    <form @submit.prevent="saveHome">
-      <div class="field mb-3">
-        <label for="name">Name</label>
-        <pv-input-text
+    <form class="form card" @submit.prevent="saveHome">
+      <div class="form-field">
+        <label class="form-label" for="name">Name</label>
+        <input
             id="name"
             v-model="form.name"
-            class="w-full"
-            required/>
+            class="form-input"
+            type="text"
+            required
+        />
       </div>
 
-      <div class="field mb-3">
-        <label for="type">Type</label>
-        <pv-input-text
+      <div class="form-field">
+        <label class="form-label" for="type">Type</label>
+        <input
             id="type"
             v-model="form.type"
-            class="w-full"
-            required/>
+            class="form-input"
+            type="text"
+            required
+        />
       </div>
 
-      <pv-button
-          label="Save"
-          icon="pi pi-save"
-          type="submit"/>
-
-      <pv-button
-          label="Cancel"
-          class="ml-2"
-          severity="secondary"
-          @click="navigateBack"/>
+      <div class="btn-row">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" @click="navigateBack">
+          Cancel
+        </button>
+      </div>
     </form>
 
-    <div
-        v-if="errors.length"
-        class="text-red-500 mt-3">
-      Errors:
-      {{ errors.map(e => e.message).join(', ') }}
+    <div v-if="errors.length" class="alert-error">
+      {{ errors.map((e) => e.message).join(', ') }}
     </div>
-  </div>
+  </section>
 </template>
-
-<style scoped>
-
-</style>
