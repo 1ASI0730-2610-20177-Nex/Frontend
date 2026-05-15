@@ -1,45 +1,40 @@
 <script setup>
-import {useRoute, useRouter} from "vue-router";
-import useManagementStore from "../../../application/management.store.js";
-import {computed, onMounted, ref, toRefs} from "vue";
-import {DeviceEntity} from "../../../domain/model/device.entity.js";
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import useManagementStore from '../../../application/management.store.js';
+import { DeviceEntity } from '../../../domain/model/device.entity.js';
 
 const route = useRoute();
 const router = useRouter();
-
 const store = useManagementStore();
-const {errors, homes, updateDevice, addDevice, fetchHomes} = store;
+const { errors, homes, updateDevice, addDevice, fetchHomes } = store;
 
 const form = ref({
   name: '',
   type: '',
   powerWatts: null,
   status: '',
-  homeId: null
+  homeId: null,
 });
 
 const isEdit = computed(() => !!route.params.id);
+const statusOptions = ['on', 'off'];
 
 onMounted(() => {
   if (!homes.length) fetchHomes();
   if (isEdit.value) {
-    const device = getDeviceById(route.params.id);
+    const device = store.getDeviceById(route.params.id);
     if (device) {
-      form.value.name       = device.name;
-      form.value.type       = device.type;
+      form.value.name = device.name;
+      form.value.type = device.type;
       form.value.powerWatts = device.powerWatts;
-      form.value.status     = device.status;
-      form.value.homeId     = device.homeId;
-    } else router.push({name: 'management-devices'});
+      form.value.status = device.status;
+      form.value.homeId = device.homeId;
+    } else router.push({ name: 'management-devices' });
   }
 });
 
-function getDeviceById(id) {
-  return store.getDeviceById(id);
-}
-
 const saveDevice = () => {
-
   const device = new DeviceEntity({
     id: isEdit.value ? route.params.id : null,
     name: form.value.name,
@@ -48,91 +43,85 @@ const saveDevice = () => {
     status: form.value.status,
     homeId: form.value.homeId,
   });
-
-  if (isEdit.value) updateDevice(device); else addDevice(device);
+  if (isEdit.value) updateDevice(device);
+  else addDevice(device);
   navigateBack();
 };
 
-const navigateBack = () => {
-  router.push({name: 'management-devices'});
-};
+const navigateBack = () => router.push({ name: 'management-devices' });
 </script>
 
 <template>
-  <div class="p-4">
-    <h1>{{ isEdit ? 'Edit Device' : 'New Device' }}</h1>
+  <section class="page">
+    <header class="page-head">
+      <h1 class="page-title">{{ isEdit ? 'Edit Device' : 'New Device' }}</h1>
+    </header>
 
-    <form @submit.prevent="saveDevice">
-      <div class="field mb-3">
-        <label for="name">Name</label>
-        <pv-input-text
+    <form class="form card" @submit.prevent="saveDevice">
+      <div class="form-field">
+        <label class="form-label" for="name">Name</label>
+        <input
             id="name"
             v-model="form.name"
+            class="form-input"
+            type="text"
             required
-            class="w-full"/>
+        />
       </div>
 
-      <div class="field mb-3">
-        <label for="type">Type</label>
-        <pv-input-text
+      <div class="form-field">
+        <label class="form-label" for="type">Type</label>
+        <input
             id="type"
             v-model="form.type"
+            class="form-input"
+            type="text"
             required
-            class="w-full"/>
+        />
       </div>
 
-      <div class="field mb-3">
-        <label for="powerWatts">Power Watts</label>
-        <pv-input-number
+      <div class="form-field">
+        <label class="form-label" for="powerWatts">Power Watts</label>
+        <input
             id="powerWatts"
-            v-model="form.powerWatts"
+            v-model.number="form.powerWatts"
+            class="form-input"
+            type="number"
+            min="0"
             required
-            class="w-full"/>
+        />
       </div>
 
-      <div class="field mb-3">
-        <label for="status">Status</label>
-        <pv-select
-            id="status"
-            v-model="form.status"
-            :options="['on', 'off']"
-            placeholder="Select status"
-            class="w-full"/>
+      <div class="form-field">
+        <label class="form-label" for="status">Status</label>
+        <select id="status" v-model="form.status" class="form-select" required>
+          <option disabled value="">Select status</option>
+          <option v-for="opt in statusOptions" :key="opt" :value="opt">
+            {{ opt }}
+          </option>
+        </select>
       </div>
 
-      <div class="field mb-3">
-        <label for="home">Home</label>
-        <pv-select
-            id="home"
-            v-model="form.homeId"
-            :options="homes"
-            optionLabel="name"
-            optionValue="id"
-            placeholder="Select a home"
-            class="w-full"/>
+      <div class="form-field">
+        <label class="form-label" for="home">Home</label>
+        <select id="home" v-model="form.homeId" class="form-select" required>
+          <option disabled :value="null">Select a home</option>
+          <option v-for="home in homes" :key="home.id" :value="home.id">
+            {{ home.name }}
+          </option>
+        </select>
       </div>
 
-      <pv-button
-          type="submit"
-          label="Save"
-          icon="pi pi-save"/>
-
-      <pv-button
-          label="Cancel"
-          severity="secondary"
-          class="ml-2"
-          @click="navigateBack"/>
+      <div class="btn-row">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" @click="navigateBack">
+          Cancel
+        </button>
+      </div>
     </form>
 
-    <div
-        v-if="errors.length"
-        class="text-red-500 mt-3">
-      Errors:
-      {{ errors.map(e => e.message).join(', ') }}
+    <div v-if="errors.length" class="alert-error">
+      {{ errors.map((e) => e.message).join(', ') }}
     </div>
-  </div>
+  </section>
 </template>
-
-<style scoped>
-
-</style>
