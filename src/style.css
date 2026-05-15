@@ -1,17 +1,118 @@
+/* Design tokens — global CSS variables only */
+
 :root {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  /* Surfaces */
+  --color-background-main: #EEF5FB;
+  --color-background-sidebar: #F5F5F5;
+  --color-surface-card: #FFFFFF;
+
+  /* Brand */
+  --color-brand-primary: #56C0F5;
+  --color-brand-primary-soft: #BFE6FA;
+
+  /* Text */
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-on-brand: #FFFFFF;
+
+  /* Border & elevation */
+  --color-border-default: #D9E3EC;
+  --color-shadow-default: rgba(0, 0, 0, 0.05);
+
+  /* Feedback */
+  --color-feedback-error: #DC2626;
+  --color-feedback-error-surface: #FEF2F2;
+  --color-feedback-error-border: #FECACA;
+  --color-feedback-success: #16A34A;
+
+  /* Typography */
+  --font-family-primary: 'Inter', sans-serif;
+  --font-size-title: 1.75rem;
+  --font-size-body: 0.875rem;
+  --font-size-caption: 0.75rem;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Radius */
+  --radius-card: 20px;
+  --radius-control: 14px;
+
+  /* Spacing */
+  --spacing-page: 1.5rem;
+  --spacing-section: 1rem;
+  --spacing-control-gap: 0.5rem;
+
+  /* Button */
+  --button-height: 2.5rem;
+  --button-padding-x: 1rem;
+  --button-font-size: var(--font-size-body);
+  --button-font-weight: 500;
+  --button-radius: var(--radius-control);
+  --button-background-primary: var(--color-brand-primary);
+  --button-background-primary-hover: var(--color-brand-primary-soft);
+  --button-text-primary: var(--color-text-on-brand);
+  --button-background-secondary: var(--color-background-sidebar);
+  --button-text-secondary: var(--color-text-secondary);
+  --button-background-ghost: transparent;
+  --button-border-ghost: var(--color-border-default);
+  --button-text-ghost: var(--color-brand-primary);
+  --button-background-danger: var(--color-feedback-error);
+  --button-text-danger: var(--color-text-on-brand);
+
+  /* Form */
+  --form-max-width: 32rem;
+  --form-field-gap: 0.35rem;
+  --form-label-color: var(--color-text-primary);
+  --form-label-font-size: var(--font-size-body);
+  --form-label-font-weight: 500;
+  --form-input-height: 2.5rem;
+  --form-input-padding-x: 0.75rem;
+  --form-input-background: var(--color-surface-card);
+  --form-input-border: var(--color-border-default);
+  --form-input-radius: var(--radius-control);
+  --form-input-text-color: var(--color-text-primary);
+  --form-input-focus-ring: var(--color-brand-primary);
+
+  /* Card */
+  --card-background: var(--color-surface-card);
+  --card-border: var(--color-border-default);
+  --card-radius: var(--radius-card);
+  --card-shadow: 0 4px 16px var(--color-shadow-default);
+
+  /* Table */
+  --table-header-background: var(--color-background-main);
+  --table-row-hover: var(--color-brand-primary-soft);
+  --table-row-stripe: #F8FBFE;
+
+  /* Layout */
+  --layout-toolbar-height: 60px;
+  --layout-sidebar-width: 250px;
 }
 
-
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  background-color: var(--color-background-main);
 }
-p,h1,h2,h3,h4,h5,h6,a,span,div{
-  padding: 0;
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a,
+span,
+div {
   margin: 0;
+  padding: 0;
 }

@@ -1,9 +1,11 @@
 <script setup>
 import MainLayout from "./shared/presentation/layouts/main-layout.vue";
+import SidebarContent from "./shared/presentation/components/sidebar-content.vue";
 </script>
 
 <template>
-  <main-layout></main-layout>
+<sidebar-content></sidebar-content>
+
 </template>
 <style scoped>
 
