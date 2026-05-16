@@ -15,17 +15,26 @@ const menuGroups = [
     ],
   },
   {
-    id: 'consumption',
-    label: 'Consumption',
+    id: 'analytics',
+    label: 'Analytics',
     items: [
-      { label: 'Analytics', to: '/consumption/analytics', disabled: true },
+      { label: 'Consumptions', to: '/analytics/consumptions' },
+      { label: 'By Device', to: '/analytics/devices' },
+    ],
+  },
+  {
+    id: 'payments',
+    label: 'Payments',
+    items: [
+      { label: 'Payments', to: '/payments/plan' },
     ],
   },
 ];
 
 const expandedGroups = reactive({
   management: false,
-  consumption: false,
+  analytics: false,
+  payments: false,
 });
 
 const isItemActive = (item) => {
