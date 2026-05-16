@@ -1,0 +1,174 @@
+/* Payments bounded context — presentation only */
+
+.plan-price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.plan-price-current {
+  font-size: 1.75rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.plan-price-original {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  text-decoration: line-through;
+}
+
+.plan-price-currency {
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-semibold);
+}
+
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.5rem;
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.plan-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px var(--color-shadow-default);
+}
+
+.plan-card-featured {
+  border-color: var(--color-brand-primary);
+  box-shadow: 0 8px 24px rgba(86, 192, 245, 0.25);
+}
+
+.plan-card-badge {
+  align-self: flex-start;
+  margin-bottom: 0.75rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: var(--color-brand-primary-soft);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+}
+
+.plan-card-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.plan-card-desc {
+  margin: 0 0 1rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.plan-card-features {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  flex: 1;
+}
+
+.plan-card-features li {
+  position: relative;
+  padding: 0.35rem 0 0.35rem 1.35rem;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+}
+
+.plan-card-features li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.65rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-brand-primary);
+}
+
+.plan-card-actions {
+  margin-top: auto;
+}
+
+.plans-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.current-plan-card {
+  padding: 1.75rem;
+  background: linear-gradient(
+      135deg,
+      var(--color-background-main) 0%,
+      var(--color-brand-primary-soft) 100%
+  );
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+}
+
+.current-plan-label {
+  margin: 0 0 0.35rem;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+}
+
+.current-plan-name {
+  margin: 0 0 0.75rem;
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.current-plan-desc {
+  margin: 0 0 1.25rem;
+  color: var(--color-text-secondary);
+  max-width: 36rem;
+  line-height: 1.5;
+}
+
+.checkout-layout {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .checkout-layout {
+    grid-template-columns: 1fr 1.1fr;
+    align-items: start;
+  }
+}
+
+.checkout-summary {
+  padding: 1.5rem;
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+}
+
+.checkout-form-card {
+  padding: 1.5rem;
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+}
+
+.checkout-form-title {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  font-weight: var(--font-weight-semibold);
+}
