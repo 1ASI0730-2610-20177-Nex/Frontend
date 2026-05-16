@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import './style.css'
+import './payments/presentation/styles/payments.css'
 import App from './app.vue'
 
 import router from "./router.js"

@@ -110,8 +110,8 @@ watch(filterDeviceId, () => {
       </div>
     </header>
 
-    <div class="card">
-      <div class="card-toolbar">
+    <div class="card consumption-card">
+      <div class="card-toolbar consumption-toolbar">
         <div class="filter-field">
           <label class="form-label" for="filter-device">Filter by device</label>
           <select id="filter-device" v-model="filterDeviceId" class="form-select">
@@ -207,12 +207,51 @@ watch(filterDeviceId, () => {
 </template>
 
 <style scoped>
+.consumption-card {
+  margin-top: 0.25rem;
+}
+
+.consumption-toolbar {
+  row-gap: 1rem;
+}
+
 .filter-summary {
   margin: 0;
-  padding-bottom: 0.15rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border-default);
   font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
-  flex: 0 0 auto;
+  white-space: nowrap;
+  flex-shrink: 0;
   align-self: flex-end;
+}
+
+.consumption-card .table-wrap {
+  margin: 0;
+}
+
+.consumption-card .paginator {
+  margin-top: 0;
+  padding: 1rem 1.5rem;
+  background: var(--color-background-main);
+}
+
+@media (max-width: 520px) {
+  .consumption-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-field {
+    max-width: none;
+  }
+
+  .filter-summary {
+    align-self: flex-start;
+    text-align: center;
+  }
 }
 </style>
