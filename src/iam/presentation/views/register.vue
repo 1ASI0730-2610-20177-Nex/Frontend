@@ -23,7 +23,7 @@ const submit = async () => {
     try {
         await iamStore.signUp({
             name: form.value.name,
-            email: form.value.email,
+            username: form.value.email,
             password: form.value.password,
         });
 
