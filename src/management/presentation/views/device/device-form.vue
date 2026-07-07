@@ -20,8 +20,15 @@ const form = ref({
 const isEdit = computed(() => !!route.params.id);
 const statusOptions = ['on', 'off'];
 
-onMounted(() => {
-  if (!homes.length) fetchHomes();
+onMounted(async () => {
+  let loadedHomes = store.homes;
+  if (!store.homesLoaded) {
+    try {
+      loadedHomes = await store.fetchHomes();
+    } catch (e) {
+      console.error("Error fetching homes:", e);
+    }
+  }
   if (isEdit.value) {
     const device = store.getDeviceById(route.params.id);
     if (device) {
@@ -29,12 +36,15 @@ onMounted(() => {
       form.value.type = device.type;
       form.value.powerWatts = device.powerWatts;
       form.value.status = device.status;
-      form.value.homeId = device.homeId;
+      
+      const matchingHome = loadedHomes.find(h => h.defaultSpaceId === device.spaceId);
+      form.value.homeId = matchingHome ? matchingHome.id : device.spaceId;
     } else router.push({ name: 'management-devices' });
   }
 });
 
 const saveDevice = () => {
+  const selectedHome = store.homes.find(h => h.id === form.value.homeId);
   const device = new DeviceEntity({
     id: isEdit.value ? route.params.id : null,
     name: form.value.name,
@@ -42,6 +52,7 @@ const saveDevice = () => {
     powerWatts: Number(form.value.powerWatts),
     status: form.value.status,
     homeId: form.value.homeId,
+    spaceId: selectedHome ? selectedHome.defaultSpaceId : form.value.homeId,
   });
   if (isEdit.value) updateDevice(device);
   else addDevice(device);

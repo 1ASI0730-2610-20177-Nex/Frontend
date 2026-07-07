@@ -43,13 +43,15 @@ const useManagementStore = defineStore('management', () => {
     function fetchHomes(userId) {
         const resolvedUserId = resolveUserId(userId);
 
-        managementApi.getHomes(resolvedUserId)
+        return managementApi.getHomes(resolvedUserId)
             .then(response => {
                 homes.value = HomeAssembler.toEntitiesFromResponse(response);
                 homesLoaded.value = true;
+                return homes.value;
             })
             .catch(error => {
                 errors.value.push(error);
+                throw error;
             });
     }
 
