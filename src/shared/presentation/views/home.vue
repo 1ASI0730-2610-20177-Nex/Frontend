@@ -1,8 +1,25 @@
+<script setup>
+import { useUiPreferences } from '../../application/ui-preferences.js';
+
+const { t } = useUiPreferences();
+</script>
+
 <template>
-  <section class="page">
+  <section class="page home-dashboard-page">
     <header class="page-head">
-      <h1 class="page-title">Home</h1>
+      <div>
+        <p class="page-kicker">{{ t.activeSession }}</p>
+        <h1 class="page-title">{{ t.homeTitle }}</h1>
+      </div>
     </header>
-    <p>Welcome to ElectroCorp.</p>
+
+    <article class="home-welcome-card">
+      <div>
+        <p class="home-welcome-label">{{ t.quickAccess }}</p>
+        <h2>{{ t.homeWelcome }}</h2>
+        <p>{{ t.homeSubtitle }}</p>
+      </div>
+      <span class="home-welcome-icon">⚡</span>
+    </article>
   </section>
 </template>

@@ -1,35 +1,37 @@
 <script setup>
-import { reactive, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useUiPreferences } from '../../application/ui-preferences.js';
 
 const router = useRouter();
 const route = useRoute();
+const { t } = useUiPreferences();
 
-const menuGroups = [
+const menuGroups = computed(() => [
   {
     id: 'management',
-    label: 'Management Home',
+    label: t.value.management,
     items: [
-      { label: 'Homes', to: '/management/homes' },
-      { label: 'Devices', to: '/management/devices' },
+      { label: t.value.homes, to: '/management/homes' },
+      { label: t.value.devices, to: '/management/devices' },
     ],
   },
   {
     id: 'analytics',
-    label: 'Analytics',
+    label: t.value.analytics,
     items: [
-      { label: 'Consumptions', to: '/analytics/consumptions' },
-      { label: 'By Device', to: '/analytics/devices' },
+      { label: t.value.consumptions, to: '/analytics/consumptions' },
+      { label: t.value.byDevice, to: '/analytics/devices' },
     ],
   },
   {
     id: 'payments',
-    label: 'Payments',
+    label: t.value.payments,
     items: [
-      { label: 'Payments', to: '/payments/plan' },
+      { label: t.value.plan, to: '/payments/plan' },
     ],
   },
-];
+]);
 
 const expandedGroups = reactive({
   management: false,
@@ -43,7 +45,7 @@ const isItemActive = (item) => {
 };
 
 const isGroupActive = (group) =>
-    group.items.some((item) => isItemActive(item));
+  group.items.some((item) => isItemActive(item));
 
 const toggleGroup = (id) => {
   expandedGroups[id] = !expandedGroups[id];
@@ -53,77 +55,88 @@ const navigateTo = (item) => {
   if (!item.disabled && item.to) router.push(item.to);
 };
 
+const currentUserName = computed(() => {
+  try {
+    const session = JSON.parse(localStorage.getItem('electrocorp-auth') || '{}');
+    return session.name || session.email || t.value.userFallback;
+  } catch (error) {
+    return t.value.userFallback;
+  }
+});
+
 const logout = () => {
-  router.push({ name: 'Home' });
+  localStorage.removeItem('electrocorp-auth');
+  router.push({ name: 'Login' });
 };
 
 watch(
-    () => route.path,
-    () => {
-      menuGroups.forEach((group) => {
-        if (isGroupActive(group)) expandedGroups[group.id] = true;
-      });
-    },
-    { immediate: true }
+  () => route.path,
+  () => {
+    menuGroups.value.forEach((group) => {
+      if (isGroupActive(group)) expandedGroups[group.id] = true;
+    });
+  },
+  { immediate: true }
 );
 </script>
 
 <template>
   <aside class="sidebar">
     <div class="sidebar-header">
-      <p class="sidebar-brand">ElectroCorp</p>
+      <span class="sidebar-logo-icon">⚡</span>
+      <p class="sidebar-brand">{{ t.appName }}</p>
     </div>
 
     <nav class="sidebar-nav" aria-label="Main navigation">
       <button
-          type="button"
-          class="sidebar-link"
-          :class="{ 'sidebar-link-active': route.path === '/home' }"
-          @click="router.push('/home')"
+        type="button"
+        class="sidebar-link"
+        :class="{ 'sidebar-link-active': route.path === '/home' }"
+        @click="router.push('/home')"
       >
-        Home
+        {{ t.home }}
       </button>
 
       <section
-          v-for="group in menuGroups"
-          :key="group.id"
-          class="sidebar-group"
+        v-for="group in menuGroups"
+        :key="group.id"
+        class="sidebar-group"
       >
         <button
-            type="button"
-            class="sidebar-group-toggle"
-            :class="{ 'sidebar-group-toggle-active': isGroupActive(group) }"
-            :aria-expanded="expandedGroups[group.id]"
-            @click="toggleGroup(group.id)"
+          type="button"
+          class="sidebar-group-toggle"
+          :class="{ 'sidebar-group-toggle-active': isGroupActive(group) }"
+          :aria-expanded="expandedGroups[group.id]"
+          @click="toggleGroup(group.id)"
         >
           <span class="sidebar-group-label">{{ group.label }}</span>
           <span
-              class="sidebar-chevron"
-              :class="{ 'sidebar-chevron-open': expandedGroups[group.id] }"
-              aria-hidden="true"
+            class="sidebar-chevron"
+            :class="{ 'sidebar-chevron-open': expandedGroups[group.id] }"
+            aria-hidden="true"
           />
         </button>
 
         <ul v-show="expandedGroups[group.id]" class="sidebar-submenu">
           <li
-              v-for="item in group.items"
-              :key="`${group.id}-${item.label}`"
+            v-for="item in group.items"
+            :key="`${group.id}-${item.label}`"
           >
             <button
-                v-if="item.disabled"
-                type="button"
-                class="sidebar-link sidebar-link-disabled"
-                disabled
-                title="Coming soon"
+              v-if="item.disabled"
+              type="button"
+              class="sidebar-link sidebar-link-disabled"
+              disabled
+              title="Coming soon"
             >
               {{ item.label }}
             </button>
             <button
-                v-else
-                type="button"
-                class="sidebar-link"
-                :class="{ 'sidebar-link-active': isItemActive(item) }"
-                @click="navigateTo(item)"
+              v-else
+              type="button"
+              class="sidebar-link"
+              :class="{ 'sidebar-link-active': isItemActive(item) }"
+              @click="navigateTo(item)"
             >
               {{ item.label }}
             </button>
@@ -133,9 +146,9 @@ watch(
     </nav>
 
     <footer class="sidebar-footer">
-      <p class="sidebar-user-name">Osamu Dazai</p>
+      <p class="sidebar-user-name">{{ currentUserName }}</p>
       <button type="button" class="sidebar-logout" @click="logout">
-        Logout
+        {{ t.logout }}
       </button>
     </footer>
   </aside>
