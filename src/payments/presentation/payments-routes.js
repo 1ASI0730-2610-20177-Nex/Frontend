@@ -4,9 +4,9 @@ const checkout = () => import('./views/checkout.vue');
 
 const paymentsRoutes = [
     { path: '', redirect: { name: 'payments-plan' } },
-    { path: 'plan', name: 'payments-plan', component: currentPlan, meta: { title: 'My Plan' } },
-    { path: 'plans', name: 'payments-plans', component: planCatalog, meta: { title: 'Choose Plan' } },
-    { path: 'checkout/:planId', name: 'payments-checkout', component: checkout, meta: { title: 'Payment' } },
+    { path: 'plan', name: 'payments-plan', component: currentPlan, meta: { title: 'Mi plan' } },
+    { path: 'plans', name: 'payments-plans', component: planCatalog, meta: { title: 'Elegir plan' } },
+    { path: 'checkout/:planId', name: 'payments-checkout', component: checkout, meta: { title: 'Pago' } },
 ];
 
 export default paymentsRoutes;
