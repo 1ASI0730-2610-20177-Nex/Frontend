@@ -50,9 +50,17 @@ const useIamStore = defineStore('iam', () => {
             authenticated.value = true;
         }
 
-        if (data.user) {
-            currentUser.value = UserAssembler.toEntityFromResource(data.user);
-            persistAuth(authToken, data.user);
+        const userObj = data.user ?? (data.id ? {
+            id: data.id,
+            name: data.username ?? '',
+            email: data.username ?? '',
+            plan: data.plan ?? 'Free',
+            createdAt: data.createdAt ?? null
+        } : null);
+
+        if (userObj) {
+            currentUser.value = UserAssembler.toEntityFromResource(userObj);
+            persistAuth(authToken, userObj);
         }
     }
 
@@ -89,6 +97,7 @@ const useIamStore = defineStore('iam', () => {
 
     async function restoreSession() {
         const savedToken = localStorage.getItem('token');
+        const savedUser = localStorage.getItem('user');
 
         if (!savedToken) {
             authReady.value = true;
@@ -97,18 +106,21 @@ const useIamStore = defineStore('iam', () => {
 
         token.value = savedToken;
 
-        try {
-            const response = await iamApi.getMe();
-            currentUser.value = UserAssembler.toEntityFromResource(response.data);
-            authenticated.value = true;
-            localStorage.setItem('user', JSON.stringify(response.data));
-            return true;
-        } catch {
-            signOut();
-            return false;
-        } finally {
-            authReady.value = true;
+        if (savedUser) {
+            try {
+                const userData = JSON.parse(savedUser);
+                currentUser.value = UserAssembler.toEntityFromResource(userData);
+                authenticated.value = true;
+                authReady.value = true;
+                return true;
+            } catch (e) {
+                console.error("Error restoring session:", e);
+            }
         }
+
+        signOut();
+        authReady.value = true;
+        return false;
     }
 
     function fetchUsers() {
