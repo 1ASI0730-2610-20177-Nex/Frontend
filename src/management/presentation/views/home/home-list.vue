@@ -7,7 +7,7 @@ import useManagementStore from '../../../application/management.store.js';
 const router = useRouter();
 const store = useManagementStore();
 const { homes, errors, homesLoaded } = storeToRefs(store);
-const { fetchHomes, deleteHome } = store;
+const { fetchHomes } = store;
 
 const page = ref(0);
 const rows = ref(5);
@@ -48,14 +48,6 @@ const toggleSort = (field) => {
 };
 
 const navigateToNew = () => router.push({ name: 'management-home-new' });
-const navigateToEdit = (id) =>
-    router.push({ name: 'management-home-edit', params: { id } });
-
-const confirmDelete = (home) => {
-  if (window.confirm(`Are you sure you want to delete ${home.name}?`)) {
-    deleteHome(home);
-  }
-};
 
 const prevPage = () => {
   if (page.value > 0) page.value -= 1;
@@ -77,58 +69,40 @@ watch(
 <template>
   <section class="page">
     <header class="page-head">
-      <h1 class="page-title">Homes</h1>
+      <h1 class="page-title">Propiedades</h1>
       <button type="button" class="btn btn-primary" @click="navigateToNew">
-        New Home
+        <i class="pi pi-plus" aria-hidden="true" />
+        Nueva propiedad
       </button>
     </header>
 
     <div class="card">
-      <div v-if="!homesLoaded" class="table-loading">Loading homes…</div>
+      <div v-if="!homesLoaded" class="table-loading">Cargando propiedades…</div>
 
       <div v-else class="table-wrap">
         <table class="table">
           <thead>
           <tr>
             <th @click="toggleSort('id')">ID</th>
-            <th @click="toggleSort('name')">Name</th>
-            <th>Actions</th>
+            <th @click="toggleSort('name')">Nombre</th>
+            <th @click="toggleSort('type')">Tipo</th>
           </tr>
           </thead>
           <tbody>
           <tr v-if="!pageHomes.length">
-            <td colspan="3" class="table-empty">No homes found.</td>
+            <td colspan="3" class="table-empty">No hay propiedades registradas.</td>
           </tr>
           <tr v-for="home in pageHomes" :key="home.id">
             <td>{{ home.id }}</td>
             <td>{{ home.name }}</td>
-            <td>
-              <div class="table-actions">
-                <button
-                    type="button"
-                    class="btn btn-ghost btn-icon"
-                    title="Edit"
-                    @click="navigateToEdit(home.id)"
-                >
-                  ✎
-                </button>
-                <button
-                    type="button"
-                    class="btn btn-danger btn-icon"
-                    title="Delete"
-                    @click="confirmDelete(home)"
-                >
-                  ✕
-                </button>
-              </div>
-            </td>
+            <td>{{ home.type }}</td>
           </tr>
           </tbody>
         </table>
       </div>
 
       <footer v-if="homesLoaded" class="paginator">
-        <span>Page {{ page + 1 }} of {{ totalPages }}</span>
+        <span>Página {{ page + 1 }} de {{ totalPages }}</span>
         <div class="paginator-btns">
           <button
               type="button"
@@ -136,7 +110,7 @@ watch(
               :disabled="page === 0"
               @click="prevPage"
           >
-            Previous
+            Anterior
           </button>
           <button
               type="button"
@@ -144,7 +118,7 @@ watch(
               :disabled="page >= totalPages - 1"
               @click="nextPage"
           >
-            Next
+            Siguiente
           </button>
         </div>
       </footer>

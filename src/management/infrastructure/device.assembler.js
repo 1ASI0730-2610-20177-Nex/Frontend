@@ -3,7 +3,11 @@ import {DeviceEntity} from "../domain/model/device.entity.js";
 export class DeviceAssembler {
 
     static toEntityFromResource(resource) {
-        return new DeviceEntity({...resource})
+        return new DeviceEntity({
+            ...resource,
+            homeId: resource.homeId ?? resource.spaceId ?? null,
+            spaceId: resource.spaceId ?? resource.homeId ?? null,
+        });
     }
 
     static toEntitiesFromResponse(response) {

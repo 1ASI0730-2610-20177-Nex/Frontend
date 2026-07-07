@@ -1,9 +1,9 @@
-import {HomeEntity} from "../domain/model/home.entity.js";
+import {SimulationSessionEntity} from "../domain/model/simulation-session.entity.js";
 
-export class HomeAssembler {
+export class SimulationSessionAssembler {
 
     static toEntityFromResource(resource) {
-        return new HomeEntity({...resource})
+        return new SimulationSessionEntity({...resource});
     }
 
     static toEntitiesFromResponse(response) {
@@ -11,7 +11,9 @@ export class HomeAssembler {
             console.error(`${response.status}, ${response.statusText}`);
             return [];
         }
-        let resources = response.data instanceof Array ? response.data : response.data['properties'] ?? response.data['homes'];
+        const resources = response.data instanceof Array
+            ? response.data
+            : response.data['simulationSessions'];
 
         return resources.map(resource => this.toEntityFromResource(resource));
     }

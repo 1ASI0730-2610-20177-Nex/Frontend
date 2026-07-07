@@ -1,5 +1,3 @@
-import {HomeEntity} from "./home.entity.js";
-
 export class DeviceEntity {
 
 
@@ -10,13 +8,15 @@ export class DeviceEntity {
                     powerWatts = 0,
                     status = '',
                     homeId = null,
+                    spaceId = null,
                 }) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.powerWatts = powerWatts;
         this.status = status;
-        this.homeId = homeId instanceof HomeEntity? homeId : null;
+        this.spaceId = spaceId ?? homeId;
+        this.homeId = homeId ?? spaceId;
     }
 
 }
