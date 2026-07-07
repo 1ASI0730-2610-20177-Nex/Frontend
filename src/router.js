@@ -6,7 +6,7 @@ import PaymentsRoutes from "./payments/presentation/payments-routes.js";
 
 const routes = [
     {path: '/',                redirect: '/home' },
-    {path: '/home',            name:'Home' ,       component: Home,            meta:{title:'Home'}},
+    {path: '/home',            name:'Home' ,       component: Home,            meta:{title:'Inicio'}},
     {path: '/management',      name: 'management', children: ManagementRoutes },
     {path: '/analytics',       name: 'analytics',  children: AnalyticsRoutes },
     {path: '/payments',        name: 'payments',   children: PaymentsRoutes },
