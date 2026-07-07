@@ -4,10 +4,12 @@ import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import useAnalyticsStore from '../../../application/analytics.store.js';
 import useManagementStore from '../../../../management/application/management.store.js';
+import { useUiPreferences } from '../../../../shared/application/ui-preferences.js';
 
 const router = useRouter();
 const analyticsStore = useAnalyticsStore();
 const managementStore = useManagementStore();
+const { t } = useUiPreferences();
 const { consumptions, consumptionsLoaded, errors } = storeToRefs(analyticsStore);
 const { fetchConsumptions, deleteConsumption } = analyticsStore;
 const { fetchDevices } = managementStore;
@@ -25,7 +27,7 @@ onMounted(() => {
 
 const deviceName = (deviceId) => {
   const device = managementStore.getDeviceById(deviceId);
-  return device ? device.name : `Device #${deviceId}`;
+  return device ? device.name : t.value.deviceFallback(deviceId);
 };
 
 const filteredConsumptions = computed(() => {
@@ -51,9 +53,7 @@ const pageConsumptions = computed(() => {
   return sortedConsumptions.value.slice(start, start + rows.value);
 });
 
-const totalPages = computed(() =>
-    Math.max(1, Math.ceil(sortedConsumptions.value.length / rows.value))
-);
+const totalPages = computed(() => Math.max(1, Math.ceil(sortedConsumptions.value.length / rows.value)));
 
 const toggleSort = (field) => {
   if (sortField.value === field) sortOrder.value *= -1;
@@ -64,13 +64,11 @@ const toggleSort = (field) => {
 };
 
 const navigateToNew = () => router.push({ name: 'analytics-consumption-new' });
-const navigateToEdit = (id) =>
-    router.push({ name: 'analytics-consumption-edit', params: { id } });
-const navigateToDeviceAnalytics = () =>
-    router.push({ name: 'analytics-devices' });
+const navigateToEdit = (id) => router.push({ name: 'analytics-consumption-edit', params: { id } });
+const navigateToDeviceAnalytics = () => router.push({ name: 'analytics-devices' });
 
 const confirmDelete = (consumption) => {
-  if (window.confirm(`Delete consumption record from ${consumption.date}?`)) {
+  if (window.confirm(t.value.confirmDeleteConsumption(consumption.date))) {
     deleteConsumption(consumption);
   }
 };
@@ -83,13 +81,10 @@ const nextPage = () => {
   if (page.value < totalPages.value - 1) page.value += 1;
 };
 
-watch(
-    () => filteredConsumptions.value.length,
-    () => {
-      const lastPage = Math.max(0, totalPages.value - 1);
-      if (page.value > lastPage) page.value = lastPage;
-    }
-);
+watch(() => filteredConsumptions.value.length, () => {
+  const lastPage = Math.max(0, totalPages.value - 1);
+  if (page.value > lastPage) page.value = lastPage;
+});
 
 watch(filterDeviceId, () => {
   page.value = 0;
@@ -99,53 +94,43 @@ watch(filterDeviceId, () => {
 <template>
   <section class="page">
     <header class="page-head">
-      <h1 class="page-title">Consumptions</h1>
+      <h1 class="page-title">{{ t.consumptions }}</h1>
       <div class="page-head-actions">
-        <button type="button" class="btn btn-secondary" @click="navigateToDeviceAnalytics">
-          By Device
-        </button>
-        <button type="button" class="btn btn-primary" @click="navigateToNew">
-          New Record
-        </button>
+        <button type="button" class="btn btn-secondary" @click="navigateToDeviceAnalytics">{{ t.byDevice }}</button>
+        <button type="button" class="btn btn-primary" @click="navigateToNew">{{ t.newRecord }}</button>
       </div>
     </header>
 
     <div class="card consumption-card">
       <div class="card-toolbar consumption-toolbar">
         <div class="filter-field">
-          <label class="form-label" for="filter-device">Filter by device</label>
+          <label class="form-label" for="filter-device">{{ t.filterByDevice }}</label>
           <select id="filter-device" v-model="filterDeviceId" class="form-select">
-            <option value="">All devices</option>
-            <option
-                v-for="device in managementStore.devices"
-                :key="device.id"
-                :value="device.id"
-            >
-              {{ device.name }}
-            </option>
+            <option value="">{{ t.allDevices }}</option>
+            <option v-for="device in managementStore.devices" :key="device.id" :value="device.id">{{ device.name }}</option>
           </select>
         </div>
         <p v-if="consumptionsLoaded" class="filter-summary">
-          {{ filteredConsumptions.length }} record(s)
+          {{ filteredConsumptions.length }} {{ t.records }}
         </p>
       </div>
 
-      <div v-if="!consumptionsLoaded" class="table-loading">Loading consumptions…</div>
+      <div v-if="!consumptionsLoaded" class="table-loading">{{ t.loadingConsumptions }}</div>
 
       <div v-else class="table-wrap">
         <table class="table">
           <thead>
           <tr>
             <th @click="toggleSort('id')">ID</th>
-            <th @click="toggleSort('deviceId')">Device</th>
+            <th @click="toggleSort('deviceId')">{{ t.device }}</th>
             <th @click="toggleSort('kwh')">kWh</th>
-            <th @click="toggleSort('date')">Date</th>
-            <th>Actions</th>
+            <th @click="toggleSort('date')">{{ t.date }}</th>
+            <th>{{ t.actions }}</th>
           </tr>
           </thead>
           <tbody>
           <tr v-if="!pageConsumptions.length">
-            <td colspan="5" class="table-empty">No consumption records found.</td>
+            <td colspan="5" class="table-empty">{{ t.noConsumptions }}</td>
           </tr>
           <tr v-for="consumption in pageConsumptions" :key="consumption.id">
             <td>{{ consumption.id }}</td>
@@ -154,22 +139,8 @@ watch(filterDeviceId, () => {
             <td>{{ consumption.date }}</td>
             <td>
               <div class="table-actions">
-                <button
-                    type="button"
-                    class="btn btn-ghost btn-icon"
-                    title="Edit"
-                    @click="navigateToEdit(consumption.id)"
-                >
-                  ✎
-                </button>
-                <button
-                    type="button"
-                    class="btn btn-danger btn-icon"
-                    title="Delete"
-                    @click="confirmDelete(consumption)"
-                >
-                  ✕
-                </button>
+                <button type="button" class="btn btn-ghost btn-icon" :title="t.change" @click="navigateToEdit(consumption.id)">✎</button>
+                <button type="button" class="btn btn-danger btn-icon" :title="t.actions" @click="confirmDelete(consumption)">✕</button>
               </div>
             </td>
           </tr>
@@ -178,24 +149,10 @@ watch(filterDeviceId, () => {
       </div>
 
       <footer v-if="consumptionsLoaded" class="paginator">
-        <span>Page {{ page + 1 }} of {{ totalPages }}</span>
+        <span>{{ t.page }} {{ page + 1 }} {{ t.of }} {{ totalPages }}</span>
         <div class="paginator-btns">
-          <button
-              type="button"
-              class="btn btn-secondary"
-              :disabled="page === 0"
-              @click="prevPage"
-          >
-            Previous
-          </button>
-          <button
-              type="button"
-              class="btn btn-secondary"
-              :disabled="page >= totalPages - 1"
-              @click="nextPage"
-          >
-            Next
-          </button>
+          <button type="button" class="btn btn-secondary" :disabled="page === 0" @click="prevPage">{{ t.previous }}</button>
+          <button type="button" class="btn btn-secondary" :disabled="page >= totalPages - 1" @click="nextPage">{{ t.next }}</button>
         </div>
       </footer>
     </div>
@@ -207,14 +164,8 @@ watch(filterDeviceId, () => {
 </template>
 
 <style scoped>
-.consumption-card {
-  margin-top: 0.25rem;
-}
-
-.consumption-toolbar {
-  row-gap: 1rem;
-}
-
+.consumption-card { margin-top: 0.25rem; }
+.consumption-toolbar { row-gap: 1rem; }
 .filter-summary {
   margin: 0;
   padding: 0.55rem 0.85rem;
@@ -228,30 +179,15 @@ watch(filterDeviceId, () => {
   flex-shrink: 0;
   align-self: flex-end;
 }
-
-.consumption-card .table-wrap {
-  margin: 0;
-}
-
+.consumption-card .table-wrap { margin: 0; }
 .consumption-card .paginator {
   margin-top: 0;
   padding: 1rem 1.5rem;
   background: var(--color-background-main);
 }
-
 @media (max-width: 520px) {
-  .consumption-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .filter-field {
-    max-width: none;
-  }
-
-  .filter-summary {
-    align-self: flex-start;
-    text-align: center;
-  }
+  .consumption-toolbar { flex-direction: column; align-items: stretch; }
+  .filter-field { max-width: none; }
+  .filter-summary { align-self: flex-start; text-align: center; }
 }
 </style>

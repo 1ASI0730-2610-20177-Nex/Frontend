@@ -172,3 +172,32 @@
   font-size: 1.1rem;
   font-weight: var(--font-weight-semibold);
 }
+
+/* Color consistency for Payments when using Web App dark/light controls */
+.plan-card,
+.current-plan-card,
+.checkout-summary,
+.checkout-form-card {
+  color: var(--color-text-primary);
+}
+
+.plan-card-title,
+.current-plan-name,
+.checkout-form-title,
+.plan-price-current,
+.plan-price-currency,
+.plan-card-features li,
+.form-label {
+  color: var(--color-text-primary);
+}
+
+.plan-card-desc,
+.current-plan-desc,
+.current-plan-label,
+.plan-price-original {
+  color: var(--color-text-secondary);
+}
+
+body.app-dark-theme .current-plan-card {
+  background: linear-gradient(135deg, #111827 0%, rgba(86, 192, 245, 0.12) 100%);
+}

@@ -3,10 +3,12 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import useManagementStore from '../../../application/management.store.js';
 import { HomeEntity } from '../../../domain/model/home.entity.js';
+import { useUiPreferences } from '../../../../shared/application/ui-preferences.js';
 
 const route = useRoute();
 const router = useRouter();
 const store = useManagementStore();
+const { t } = useUiPreferences();
 const { errors, addHome, updateHome } = store;
 
 const form = ref({ name: '', type: '' });
@@ -39,37 +41,23 @@ const navigateBack = () => router.push({ name: 'management-homes' });
 <template>
   <section class="page">
     <header class="page-head">
-      <h1 class="page-title">{{ isEdit ? 'Edit Home' : 'New Home' }}</h1>
+      <h1 class="page-title">{{ isEdit ? t.editHome : t.newHome }}</h1>
     </header>
 
     <form class="form card" @submit.prevent="saveHome">
       <div class="form-field">
-        <label class="form-label" for="name">Name</label>
-        <input
-            id="name"
-            v-model="form.name"
-            class="form-input"
-            type="text"
-            required
-        />
+        <label class="form-label" for="name">{{ t.name }}</label>
+        <input id="name" v-model="form.name" class="form-input" type="text" required />
       </div>
 
       <div class="form-field">
-        <label class="form-label" for="type">Type</label>
-        <input
-            id="type"
-            v-model="form.type"
-            class="form-input"
-            type="text"
-            required
-        />
+        <label class="form-label" for="type">{{ t.type }}</label>
+        <input id="type" v-model="form.type" class="form-input" type="text" required />
       </div>
 
       <div class="btn-row">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" class="btn btn-secondary" @click="navigateBack">
-          Cancel
-        </button>
+        <button type="submit" class="btn btn-primary">{{ t.save }}</button>
+        <button type="button" class="btn btn-secondary" @click="navigateBack">{{ t.cancel }}</button>
       </div>
     </form>
 

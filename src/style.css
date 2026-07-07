@@ -1146,3 +1146,34 @@ body.app-dark-theme .auth-page-dark {
     flex-direction: column;
   }
 }
+
+/* Mirror dark variables on the shell too, so every routed Web App page inherits them correctly. */
+.app-shell.app-shell-dark {
+  --color-background-main: #070b18;
+  --color-background-sidebar: #0b1220;
+  --color-surface-card: #111827;
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #9ca3af;
+  --color-border-default: rgba(255, 255, 255, 0.12);
+  --color-shadow-default: rgba(0, 0, 0, 0.35);
+  --table-header-background: #0f172a;
+  --table-row-hover: rgba(86, 192, 245, 0.16);
+  --table-row-stripe: rgba(255, 255, 255, 0.03);
+  --form-input-background: #0b1220;
+  --form-input-text-color: #f8fafc;
+  --form-input-border: rgba(255, 255, 255, 0.14);
+  --button-background-secondary: #111827;
+  --button-text-secondary: #f8fafc;
+  --card-background: #111827;
+  --card-border: rgba(255, 255, 255, 0.12);
+}
+
+.app-shell.app-shell-dark .btn-secondary {
+  background: #111827;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.app-shell.app-shell-dark .btn-secondary:hover:not(:disabled) {
+  background: #1f2937;
+}

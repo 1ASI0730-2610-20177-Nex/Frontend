@@ -1,14 +1,16 @@
 <script setup>
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { DEFAULT_PLAN_ID, getPlanById } from '../data/plans.data.js';
+import { DEFAULT_PLAN_ID, getPlanById, translatePlan } from '../data/plans.data.js';
+import { useUiPreferences } from '../../../shared/application/ui-preferences.js';
 
 const route = useRoute();
 const router = useRouter();
+const { language, t } = useUiPreferences();
 
 const selectedPlan = computed(() => {
   const planId = route.query.plan ?? DEFAULT_PLAN_ID;
-  return getPlanById(planId);
+  return translatePlan(getPlanById(planId), language.value);
 });
 
 const goToPlans = () => router.push({ name: 'payments-plans' });
@@ -17,13 +19,13 @@ const goToPlans = () => router.push({ name: 'payments-plans' });
 <template>
   <section class="page">
     <header class="page-head">
-      <h1 class="page-title">Payments</h1>
+      <h1 class="page-title">{{ t.payments }}</h1>
     </header>
 
-    <p class="section-eyebrow">Plan seleccionado</p>
+    <p class="section-eyebrow">{{ t.selectedPlan }}</p>
 
     <article class="current-plan-card">
-      <p class="current-plan-label">Tu plan actual</p>
+      <p class="current-plan-label">{{ t.currentPlan }}</p>
       <h2 class="current-plan-name">{{ selectedPlan.name }}</h2>
 
       <div class="plan-price">
@@ -35,14 +37,12 @@ const goToPlans = () => router.push({ name: 'payments-plans' });
       <p class="current-plan-desc">{{ selectedPlan.description }}</p>
 
       <ul class="plan-card-features">
-        <li v-for="feature in selectedPlan.features" :key="feature">
-          {{ feature }}
-        </li>
+        <li v-for="feature in selectedPlan.features" :key="feature">{{ feature }}</li>
       </ul>
 
       <div class="page-head-actions">
         <button type="button" class="btn btn-secondary" @click="goToPlans">
-          Cambiar
+          {{ t.change }}
         </button>
       </div>
     </article>
@@ -58,8 +58,5 @@ const goToPlans = () => router.push({ name: 'payments-plans' });
   letter-spacing: 0.06em;
   color: var(--color-text-secondary);
 }
-
-.current-plan-card .plan-card-features {
-  margin-bottom: 1.25rem;
-}
+.current-plan-card .plan-card-features { margin-bottom: 1.25rem; }
 </style>

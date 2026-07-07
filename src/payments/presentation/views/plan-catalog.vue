@@ -1,34 +1,29 @@
 <script setup>
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { PLANS } from '../data/plans.data.js';
+import { PLANS, translatePlan } from '../data/plans.data.js';
+import { useUiPreferences } from '../../../shared/application/ui-preferences.js';
 
 const router = useRouter();
+const { language, t } = useUiPreferences();
 
-const buyPlan = (planId) => {
-  router.push({ name: 'payments-checkout', params: { planId } });
-};
-
+const translatedPlans = computed(() => PLANS.map((plan) => translatePlan(plan, language.value)));
+const buyPlan = (planId) => router.push({ name: 'payments-checkout', params: { planId } });
 const goBack = () => router.push({ name: 'payments-plan' });
 </script>
 
 <template>
   <section class="page">
     <header class="page-head">
-      <h1 class="page-title">Choose your plan</h1>
+      <h1 class="page-title">{{ t.choosePlan }}</h1>
       <button type="button" class="btn btn-secondary" @click="goBack">
-        Back
+        {{ t.back }}
       </button>
     </header>
 
     <div class="plans-grid">
-      <article
-          v-for="plan in PLANS"
-          :key="plan.id"
-          class="plan-card"
-          :class="{ 'plan-card-featured': plan.highlighted }"
-      >
-        <span v-if="plan.highlighted" class="plan-card-badge">Most popular</span>
-
+      <article v-for="plan in translatedPlans" :key="plan.id" class="plan-card" :class="{ 'plan-card-featured': plan.highlighted }">
+        <span v-if="plan.highlighted" class="plan-card-badge">{{ t.mostPopular }}</span>
         <h2 class="plan-card-title">{{ plan.name }}</h2>
 
         <div class="plan-price">
@@ -40,19 +35,12 @@ const goBack = () => router.push({ name: 'payments-plan' });
         <p class="plan-card-desc">{{ plan.description }}</p>
 
         <ul class="plan-card-features">
-          <li v-for="feature in plan.features" :key="feature">
-            {{ feature }}
-          </li>
+          <li v-for="feature in plan.features" :key="feature">{{ feature }}</li>
         </ul>
 
         <div class="plan-card-actions">
-          <button
-              type="button"
-              class="btn btn-primary"
-              style="width: 100%;"
-              @click="buyPlan(plan.id)"
-          >
-            Buy Service
+          <button type="button" class="btn btn-primary" style="width: 100%;" @click="buyPlan(plan.id)">
+            {{ t.buyService }}
           </button>
         </div>
       </article>
