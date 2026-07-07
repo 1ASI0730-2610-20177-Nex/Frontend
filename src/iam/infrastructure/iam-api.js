@@ -11,6 +11,10 @@ export class IamApi extends BaseApi {
         return this.http.post(ApiEndpoints.authentication.signIn, payload);
     }
 
+    getMe() {
+        return this.http.get(ApiEndpoints.authentication.me);
+    }
+
     getUsers() {
         return this.http.get(ApiEndpoints.users);
     }

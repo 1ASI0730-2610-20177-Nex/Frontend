@@ -1,38 +1,45 @@
 <script setup>
 import { reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import useIamStore from '../../../iam/application/iam.store.js';
 
 const router = useRouter();
 const route = useRoute();
+const iamStore = useIamStore();
+const { currentUser, userInitials } = storeToRefs(iamStore);
 
 const menuGroups = [
   {
     id: 'management',
-    label: 'Management Home',
+    label: 'Gestión',
+    icon: 'pi pi-building',
     items: [
-      { label: 'Homes', to: '/management/homes' },
-      { label: 'Devices', to: '/management/devices' },
+      { label: 'Propiedades', to: '/management/homes', icon: 'pi pi-home' },
+      { label: 'Dispositivos', to: '/management/devices', icon: 'pi pi-bolt' },
     ],
   },
   {
     id: 'analytics',
-    label: 'Analytics',
+    label: 'Analítica',
+    icon: 'pi pi-chart-line',
     items: [
-      { label: 'Consumptions', to: '/analytics/consumptions' },
-      { label: 'By Device', to: '/analytics/devices' },
+      { label: 'Consumos', to: '/analytics/consumptions', icon: 'pi pi-list' },
+      { label: 'Por dispositivo', to: '/analytics/devices', icon: 'pi pi-chart-bar' },
     ],
   },
   {
     id: 'payments',
-    label: 'Payments',
+    label: 'Pagos',
+    icon: 'pi pi-credit-card',
     items: [
-      { label: 'Payments', to: '/payments/plan' },
+      { label: 'Mi plan', to: '/payments/plan', icon: 'pi pi-wallet' },
     ],
   },
 ];
 
 const expandedGroups = reactive({
-  management: false,
+  management: true,
   analytics: false,
   payments: false,
 });
@@ -54,7 +61,8 @@ const navigateTo = (item) => {
 };
 
 const logout = () => {
-  router.push({ name: 'Home' });
+  iamStore.signOut();
+  router.push({ name: 'login' });
 };
 
 watch(
@@ -71,17 +79,24 @@ watch(
 <template>
   <aside class="sidebar">
     <div class="sidebar-header">
-      <p class="sidebar-brand">ElectroCorp</p>
+      <div class="sidebar-logo" aria-hidden="true">
+        <i class="pi pi-bolt" />
+      </div>
+      <div class="sidebar-brand-wrap">
+        <p class="sidebar-brand">ElectroCorp</p>
+        <p class="sidebar-tagline">Energy Platform</p>
+      </div>
     </div>
 
-    <nav class="sidebar-nav" aria-label="Main navigation">
+    <nav class="sidebar-nav" aria-label="Navegación principal">
       <button
           type="button"
-          class="sidebar-link"
+          class="sidebar-link sidebar-link-top"
           :class="{ 'sidebar-link-active': route.path === '/home' }"
           @click="router.push('/home')"
       >
-        Home
+        <i class="pi pi-th-large" aria-hidden="true" />
+        <span>Inicio</span>
       </button>
 
       <section
@@ -96,10 +111,13 @@ watch(
             :aria-expanded="expandedGroups[group.id]"
             @click="toggleGroup(group.id)"
         >
-          <span class="sidebar-group-label">{{ group.label }}</span>
-          <span
-              class="sidebar-chevron"
-              :class="{ 'sidebar-chevron-open': expandedGroups[group.id] }"
+          <span class="sidebar-group-left">
+            <i :class="group.icon" aria-hidden="true" />
+            <span class="sidebar-group-label">{{ group.label }}</span>
+          </span>
+          <i
+              class="pi sidebar-chevron-icon"
+              :class="expandedGroups[group.id] ? 'pi-chevron-down' : 'pi-chevron-right'"
               aria-hidden="true"
           />
         </button>
@@ -114,9 +132,10 @@ watch(
                 type="button"
                 class="sidebar-link sidebar-link-disabled"
                 disabled
-                title="Coming soon"
+                title="Próximamente"
             >
-              {{ item.label }}
+              <i :class="item.icon" aria-hidden="true" />
+              <span>{{ item.label }}</span>
             </button>
             <button
                 v-else
@@ -125,7 +144,8 @@ watch(
                 :class="{ 'sidebar-link-active': isItemActive(item) }"
                 @click="navigateTo(item)"
             >
-              {{ item.label }}
+              <i :class="item.icon" aria-hidden="true" />
+              <span>{{ item.label }}</span>
             </button>
           </li>
         </ul>
@@ -133,9 +153,16 @@ watch(
     </nav>
 
     <footer class="sidebar-footer">
-      <p class="sidebar-user-name">Osamu Dazai</p>
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" aria-hidden="true">{{ userInitials }}</div>
+        <div class="sidebar-user-info">
+          <p class="sidebar-user-name">{{ currentUser?.name ?? 'Usuario' }}</p>
+          <p class="sidebar-user-role">{{ currentUser?.email ?? '' }}</p>
+        </div>
+      </div>
       <button type="button" class="sidebar-logout" @click="logout">
-        Logout
+        <i class="pi pi-sign-out" aria-hidden="true" />
+        <span>Cerrar sesión</span>
       </button>
     </footer>
   </aside>

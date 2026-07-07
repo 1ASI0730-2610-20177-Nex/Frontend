@@ -1,13 +1,13 @@
 
 import {defineStore} from "pinia";
 import {computed, ref} from "vue";
+import useIamStore from "../../iam/application/iam.store.js";
 
 import {ConsumptionEntity} from "../domain/model/consumption.entity.js";
 import {ConsumptionAssembler} from "../infrastructure/consumption.assembler.js";
 import {AnalyticsApi} from "../infrastructure/analytics-api.js";
 
 const analyticsApi = new AnalyticsApi();
-const defaultUserId = import.meta.env.VITE_DEFAULT_USER_ID ?? null;
 
 const useAnalyticsStore = defineStore('analytics', () => {
 
@@ -43,7 +43,9 @@ const useAnalyticsStore = defineStore('analytics', () => {
     });
 
     function resolveUserId(userId) {
-        return userId ?? defaultUserId;
+        if (userId) return userId;
+        const iamStore = useIamStore();
+        return iamStore.userId ?? import.meta.env.VITE_DEFAULT_USER_ID ?? null;
     }
 
     function fetchConsumptions() {

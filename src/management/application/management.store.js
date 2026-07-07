@@ -1,6 +1,7 @@
 
 import {defineStore} from "pinia";
 import {computed, ref} from "vue";
+import useIamStore from "../../iam/application/iam.store.js";
 
 import {HomeEntity} from "../domain/model/home.entity.js";
 import {HomeAssembler} from "../infrastructure/home.assembler.js";
@@ -12,7 +13,6 @@ import {SimulationSessionAssembler} from "../infrastructure/simulation-session.a
 import {ManagementApi} from "../infrastructure/management-api.js";
 
 const managementApi = new ManagementApi();
-const defaultUserId = import.meta.env.VITE_DEFAULT_USER_ID ?? null;
 
 const useManagementStore = defineStore('management', () => {
 
@@ -35,7 +35,9 @@ const useManagementStore = defineStore('management', () => {
     });
 
     function resolveUserId(userId) {
-        return userId ?? defaultUserId;
+        if (userId) return userId;
+        const iamStore = useIamStore();
+        return iamStore.userId ?? import.meta.env.VITE_DEFAULT_USER_ID ?? null;
     }
 
     function fetchHomes(userId) {
@@ -97,7 +99,12 @@ const useManagementStore = defineStore('management', () => {
     }
 
     function addHome(home) {
-        managementApi.createHome(home)
+        const payload = {
+            ...home,
+            userId: resolveUserId(home.userId),
+        };
+
+        managementApi.createHome(payload)
             .then(response => {
                 const resource = response.data;
                 const newHome = HomeAssembler.toEntityFromResource(resource);

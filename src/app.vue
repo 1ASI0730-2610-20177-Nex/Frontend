@@ -3,8 +3,5 @@ import MainLayout from "./shared/presentation/layouts/main-layout.vue";
 </script>
 
 <template>
-<MainLayout></MainLayout>
+  <router-view />
 </template>
-
-<style scoped>
-</style>

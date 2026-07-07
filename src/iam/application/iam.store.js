@@ -8,6 +8,18 @@ import {IamApi} from "../infrastructure/iam-api.js";
 
 const iamApi = new IamApi();
 
+function persistAuth(token, user) {
+    localStorage.setItem('token', token);
+    if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
+    }
+}
+
+function clearAuthStorage() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+}
+
 const useIamStore = defineStore('iam', () => {
 
     const currentUser = ref(null);
@@ -15,13 +27,41 @@ const useIamStore = defineStore('iam', () => {
     const token = ref(localStorage.getItem('token') || null);
     const errors = ref([]);
     const usersLoaded = ref(false);
-    const authenticated = ref(!!token.value);
+    const authReady = ref(false);
+    const authenticated = ref(false);
 
     const userId = computed(() => currentUser.value?.id ?? null);
 
+    const userInitials = computed(() => {
+        const name = currentUser.value?.name ?? '';
+        return name
+            .split(' ')
+            .filter(Boolean)
+            .slice(0, 2)
+            .map(part => part[0]?.toUpperCase() ?? '')
+            .join('') || '?';
+    });
+
+    function applyAuth(data) {
+        const authToken = data.token ?? data.accessToken;
+
+        if (authToken) {
+            token.value = authToken;
+            authenticated.value = true;
+        }
+
+        if (data.user) {
+            currentUser.value = UserAssembler.toEntityFromResource(data.user);
+            persistAuth(authToken, data.user);
+        }
+    }
+
     function signUp(credentials) {
         return iamApi.signUp(credentials)
-            .then(response => response.data)
+            .then(response => {
+                applyAuth(response.data);
+                return response.data;
+            })
             .catch(error => {
                 errors.value.push(error);
                 throw error;
@@ -31,20 +71,8 @@ const useIamStore = defineStore('iam', () => {
     function signIn(credentials) {
         return iamApi.signIn(credentials)
             .then(response => {
-                const data = response.data;
-                const authToken = data.token ?? data.accessToken;
-
-                if (authToken) {
-                    token.value = authToken;
-                    localStorage.setItem('token', authToken);
-                    authenticated.value = true;
-                }
-
-                if (data.user) {
-                    currentUser.value = UserAssembler.toEntityFromResource(data.user);
-                }
-
-                return data;
+                applyAuth(response.data);
+                return response.data;
             })
             .catch(error => {
                 errors.value.push(error);
@@ -56,7 +84,31 @@ const useIamStore = defineStore('iam', () => {
         token.value = null;
         currentUser.value = null;
         authenticated.value = false;
-        localStorage.removeItem('token');
+        clearAuthStorage();
+    }
+
+    async function restoreSession() {
+        const savedToken = localStorage.getItem('token');
+
+        if (!savedToken) {
+            authReady.value = true;
+            return false;
+        }
+
+        token.value = savedToken;
+
+        try {
+            const response = await iamApi.getMe();
+            currentUser.value = UserAssembler.toEntityFromResource(response.data);
+            authenticated.value = true;
+            localStorage.setItem('user', JSON.stringify(response.data));
+            return true;
+        } catch {
+            signOut();
+            return false;
+        } finally {
+            authReady.value = true;
+        }
     }
 
     function fetchUsers() {
@@ -93,11 +145,14 @@ const useIamStore = defineStore('iam', () => {
         token,
         errors,
         usersLoaded,
+        authReady,
         authenticated,
         userId,
+        userInitials,
         signUp,
         signIn,
         signOut,
+        restoreSession,
         fetchUsers,
         fetchUserById,
         setCurrentUser,

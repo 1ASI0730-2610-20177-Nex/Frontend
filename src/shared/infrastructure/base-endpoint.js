@@ -6,8 +6,8 @@ export class BaseEndpoint {
         this.endpointPath = endpointPath;
     }
 
-    getAll() {
-        return this.http.get(this.endpointPath);
+    getAll(params = {}) {
+        return this.http.get(this.endpointPath, { params });
     }
 
     getById(id) {
