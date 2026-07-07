@@ -7,12 +7,19 @@ import {ConsumptionAssembler} from "../infrastructure/consumption.assembler.js";
 import {AnalyticsApi} from "../infrastructure/analytics-api.js";
 
 const analyticsApi = new AnalyticsApi();
+const defaultUserId = import.meta.env.VITE_DEFAULT_USER_ID ?? null;
 
 const useAnalyticsStore = defineStore('analytics', () => {
 
     const consumptions = ref([]);
+    const metrics = ref([]);
+    const alerts = ref([]);
+    const reports = ref([]);
     const errors = ref([]);
     const consumptionsLoaded = ref(false);
+    const metricsLoaded = ref(false);
+    const alertsLoaded = ref(false);
+    const reportsLoaded = ref(false);
 
     const consumptionCount = computed(() => {
         return consumptionsLoaded.value ? consumptions.value.length : 0;
@@ -35,6 +42,10 @@ const useAnalyticsStore = defineStore('analytics', () => {
         return Object.values(grouped);
     });
 
+    function resolveUserId(userId) {
+        return userId ?? defaultUserId;
+    }
+
     function fetchConsumptions() {
         analyticsApi.getConsumptions()
             .then(response => {
@@ -43,6 +54,88 @@ const useAnalyticsStore = defineStore('analytics', () => {
             })
             .catch(error => {
                 errors.value.push(error);
+            });
+    }
+
+    function fetchMetrics(propertyId) {
+        return analyticsApi.getMetrics(propertyId)
+            .then(response => {
+                metrics.value = response.data instanceof Array
+                    ? response.data
+                    : response.data['metrics'] ?? [];
+                metricsLoaded.value = true;
+            })
+            .catch(error => {
+                errors.value.push(error);
+            });
+    }
+
+    function fetchAlerts(userId) {
+        const resolvedUserId = resolveUserId(userId);
+
+        return analyticsApi.getAlerts(resolvedUserId)
+            .then(response => {
+                alerts.value = response.data instanceof Array
+                    ? response.data
+                    : response.data['alerts'] ?? [];
+                alertsLoaded.value = true;
+            })
+            .catch(error => {
+                errors.value.push(error);
+            });
+    }
+
+    function markAlertAsRead(alertId) {
+        return analyticsApi.markAlertAsRead(alertId)
+            .then(response => {
+                const index = alerts.value.findIndex(a => a.id === alertId);
+
+                if (index !== -1) {
+                    alerts.value[index] = {
+                        ...alerts.value[index],
+                        read: true,
+                        ...response.data,
+                    };
+                }
+            })
+            .catch(error => {
+                errors.value.push(error);
+                throw error;
+            });
+    }
+
+    function fetchReports(propertyId) {
+        return analyticsApi.getReports(propertyId)
+            .then(response => {
+                reports.value = response.data instanceof Array
+                    ? response.data
+                    : response.data['reports'] ?? [];
+                reportsLoaded.value = true;
+            })
+            .catch(error => {
+                errors.value.push(error);
+            });
+    }
+
+    function fetchReportById(reportId) {
+        return analyticsApi.getReportById(reportId)
+            .then(response => response.data)
+            .catch(error => {
+                errors.value.push(error);
+                throw error;
+            });
+    }
+
+    function createReport(report) {
+        return analyticsApi.createReport(report)
+            .then(response => {
+                const created = response.data;
+                reports.value.push(created);
+                return created;
+            })
+            .catch(error => {
+                errors.value.push(error);
+                throw error;
             });
     }
 
@@ -105,11 +198,23 @@ const useAnalyticsStore = defineStore('analytics', () => {
 
     return {
         consumptions,
+        metrics,
+        alerts,
+        reports,
         errors,
         consumptionsLoaded,
+        metricsLoaded,
+        alertsLoaded,
+        reportsLoaded,
         consumptionCount,
         consumptionsByDevice,
         fetchConsumptions,
+        fetchMetrics,
+        fetchAlerts,
+        markAlertAsRead,
+        fetchReports,
+        fetchReportById,
+        createReport,
         getConsumptionById,
         getConsumptionsByDeviceId,
         getTotalKwhByDeviceId,
